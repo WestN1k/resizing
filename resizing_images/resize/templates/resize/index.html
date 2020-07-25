@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}главная страница{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Список изображений</h1>
+        {% if images %}
+            {{ images }}
+        {% else %}
+        <p>нет доступных изображений</p>
+        {% endif %}
+
+        <a href="{% url 'add_image' %}">добавить новое изображение</a>
+    </div>
+{% endblock %}
