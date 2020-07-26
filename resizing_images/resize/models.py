@@ -3,11 +3,13 @@ from urllib import request
 from django.db import models
 from django.conf import settings
 from django.core.files import File
+from .storage import OverwriteStorage
 
 
 class ImageModel(models.Model):
-    image_file = models.ImageField(upload_to='images', verbose_name='Файл')
-    image_url = models.URLField(verbose_name='Ссылка')
+    image_file = models.ImageField(upload_to='images', verbose_name='Оригинальное изображение')
+    image_url = models.URLField(verbose_name='Ссылка на изображение')
+    image_resize_file = models.ImageField(upload_to='images/mini', storage=OverwriteStorage(), verbose_name='Измененное изображение', null=True)
 
     class Meta:
         ordering = ['pk', ]
@@ -24,11 +26,13 @@ class ImageModel(models.Model):
                     os.path.basename(self.image_url),
                     File(open(result[0], 'rb'))
                     )
-            self.save()
 
     # возвращает имя файла
     def filename(self):
         return os.path.basename(self.image_file.name)
+
+    def get_absolute_path(self):
+        return self.image_file.path
 
     def __str__(self):
         return self.filename()

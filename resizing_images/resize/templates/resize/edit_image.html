@@ -10,7 +10,11 @@
             <input class="container__submit" type="submit" value="Отправить">
         </form>
         <div class="container__image">
-            <img src="{{ object.image_file.url }}" alt="{{ object.filename }}">
+            {% if object.image_resize_file %}
+                <img src="{{ object.image_resize_file.url }}" alt="{{ object.filename }}">
+            {% else %}
+                <img src="{{ object.image_file.url }}" alt="{{ object.filename }}">
+            {% endif %}
         </div>
     </div>
 {% endblock %}

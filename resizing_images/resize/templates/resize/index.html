@@ -6,7 +6,7 @@
         {% if images %}
             <ul>
                 {% for image in images %}
-                    <a href="{% url 'edit_image' image.pk %}">{{ image }}</a>
+                    <li><a href="{% url 'edit_image' image.pk %}">{{ image }}</a></li>
                 {% endfor %}
             </ul>
         {% else %}

@@ -1,14 +1,15 @@
 import os
 import urllib.request
+from io import BytesIO
 from django.contrib import messages
 from django.shortcuts import render, reverse
 from django.conf import settings
 from django.core.files import File
 from django.views.generic.edit import FormMixin
-from django.views.generic import TemplateView, DetailView, CreateView, FormView
+from django.views.generic import TemplateView, DetailView, CreateView
 from .forms import AddNewImageForm, EditImageForm
 from .models import ImageModel
-
+from django.core.files.base import ContentFile
 from PIL import Image
 
 
@@ -45,20 +46,30 @@ class EditImageView(FormMixin, DetailView):
         self.object = self.get_object() # для получения атрибутов объекта
         form = self.get_form()
         if form.is_valid():
-            # width, height = get_size_image(self.object.image_file)
-            resize_image(self.object.image_file, form.cleaned_data.get('width'), form.cleaned_data.get('height'))
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+            scaled_image = resize_image(self.object.get_absolute_path(), form.cleaned_data.get('width'), form.cleaned_data.get('height'))
+            if scaled_image:
+                if self.object.image_resize_file:
+                    self.object.image_resize_file = ContentFile(scaled_image.getvalue())
+                    self.object.save()
+                else:
+                    self.object.image_resize_file.save(self.object.filename(), ContentFile(scaled_image.getvalue()), save=False)
+        return self.form_invalid(form)
 
 
+# возвращает ширину, высоту изображения
 def get_size_image(path_to_image):
     original_image = Image.open(path_to_image)
     return original_image.size
 
 
-def resize_image(path_to_image, width=None, height=None) -> bool:
-    original_image = Image.open(path_to_image)
+# изменение размера изображения с сохранением пропорций
+def resize_image(path_to_image, width=None, height=None) -> BytesIO:
+    try:
+        original_image = Image.open(path_to_image)
+    except FileNotFoundError as e:
+        print(e)
+        return False
+
     width_orig, height_orig = get_size_image(path_to_image)
     if width and height:
         max_size = (width, height)
@@ -69,19 +80,9 @@ def resize_image(path_to_image, width=None, height=None) -> bool:
     else:
         raise RuntimeError('Width or height required!')
 
-    output_folder_path = os.path.join(settings.MEDIA_ROOT, 'images', 'mini')
-
-    if not os.path.exists(output_folder_path):
-        os.makedirs(output_folder_path)
-
-    # придумать, как передавать имя изображения для создания миниатюры + как правильно передать путь до папки с миниатюрами.
-    # нужен обработчик для понятия есть ли миниатюра, для ее вывода на edit page (возможно templatetags!!!)
-    output_image_path = os.path.join(output_folder_path, '1_mini.jpg')
-
+    # уменьшение изображения, Image.ANTIALIAS для сохранения высокого качества изображения
     original_image.thumbnail(max_size, Image.ANTIALIAS)
-    original_image.save(output_image_path)
- 
-    scaled_image = Image.open(output_image_path)
-    width, height = scaled_image.size
+    thumb_io = BytesIO()
+    original_image.save(thumb_io, original_image.format, quality=80)
 
-    return True
+    return thumb_io
