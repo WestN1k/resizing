@@ -3,11 +3,14 @@
 {% block content %}
     <div class="container">
         <a href="{% url 'main' %}">Назад к списку</a>
-        <h1>Имя изображения</h1>
-        <form action="{% url 'add_image' %}" method="post">
+        <h1>{{ object.filename }}</h1>
+        <form action="{% url 'edit_image' object.pk %}" method="post" class="container__form">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Отправить">
+            <input class="container__submit" type="submit" value="Отправить">
         </form>
+        <div class="container__image">
+            <img src="{{ object.image_file.url }}" alt="{{ object.filename }}">
+        </div>
     </div>
 {% endblock %}

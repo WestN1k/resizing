@@ -4,7 +4,11 @@
     <div class="container">
         <h1>Список изображений</h1>
         {% if images %}
-            {{ images }}
+            <ul>
+                {% for image in images %}
+                    <a href="{% url 'edit_image' image.pk %}">{{ image }}</a>
+                {% endfor %}
+            </ul>
         {% else %}
         <p>нет доступных изображений</p>
         {% endif %}

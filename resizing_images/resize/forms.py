@@ -8,6 +8,7 @@ class AddNewImageForm(forms.ModelForm):
     image_url = forms.URLField(label='ссылка', required=False)
     image_file = forms.ImageField(label='Файл', required=False)
 
+    # проверка, должно быть заполнено только одно поле
     def clean(self):
         if self.cleaned_data.get('image_url') and self.cleaned_data.get('image_file'):
             raise forms.ValidationError("Должно быть заполнено одно поле")
@@ -23,5 +24,5 @@ class AddNewImageForm(forms.ModelForm):
 
 
 class EditImageForm(forms.Form):
-    width = forms.IntegerField(min_value=1, max_value=5000, required=False)
-    height = forms.IntegerField(min_value=1, max_value=5000, required=False)
+    width = forms.IntegerField(min_value=1, max_value=5000, label="Ширина", required=False)
+    height = forms.IntegerField(min_value=1, max_value=5000, label="Высота", required=False)
