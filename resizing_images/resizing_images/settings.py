@@ -9,9 +9,9 @@ if os.path.isfile(dotenv_file):
 
 DEBUG = os.getenv('DEBUG', default=False)
 
-SECRET_KEY = os.environ['SEKRET_KEY']
+SECRET_KEY = os.environ['SECRET_KEY']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
