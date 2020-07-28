@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+    nginx:
+        container_name: nginx
+        restart: always
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        ports:
+            - 1337:80
+        volumes:
+            - ./resizing_images/static:/resizing_images/static
+            - ./resizing_images/media:/resizing_images/media
+            - ./resizing_images/logs:/resizing_images/logs
+        depends_on:
+            - django
+
+    django:
+        container_name: django
+        restart: always
+        build:
+            context: .
+            dockerfile: ./docker/django/Dockerfile
+        volumes:
+            - ./resizing_images:/resizing_images
+        expose:
+            - 8000
+        command: >
+            bash -c '
+                python manage.py makemigrations &&
+                python manage.py migrate &&
+                gunicorn resizing_images.wsgi:application --bind 0.0.0.0:8000'
+            
