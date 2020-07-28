@@ -1,5 +1,5 @@
 import os
-from django.shortcuts import reverse
+from django.shortcuts import reverse, render
 from django.views.generic.edit import FormMixin
 from django.views.generic import TemplateView, DetailView, CreateView
 from django.core.files.base import ContentFile
