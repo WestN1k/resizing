@@ -1,4 +1,4 @@
-Django==2.2.14
+Django==2.2.22
 gunicorn==20.0.4
 Pillow==7.2.0
 python-dotenv==0.14.0
